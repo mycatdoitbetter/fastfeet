@@ -1,0 +1,36 @@
+Arguments: 
+  C:\Program Files\nodejs\node.exe C:\Program Files (x86)\Yarn\bin\yarn.js init
+
+PATH: 
+  C:\Python27\;C:\Python27\Scripts;C:\Program Files (x86)\Common Files\Oracle\Java\javapath;C:\WINDOWS\system32;C:\WINDOWS;C:\WINDOWS\System32\Wbem;C:\WINDOWS\System32\WindowsPowerShell\v1.0\;C:\WINDOWS\System32\OpenSSH\;C:\Program Files (x86)\NVIDIA Corporation\PhysX\Common;C:\Program Files\NVIDIA Corporation\NVIDIA NvDLISR;C:\ProgramData\chocolatey\bin;C:\Program Files\nodejs\;C:\Program Files\Java\jdk1.8.0_211\bin;C:\Program Files (x86)\Yarn\bin\;C:\Program Files\Git\cmd;C:\Program Files\Docker\Docker\resources\bin;C:\ProgramData\DockerDesktop\version-bin;C:\Users\Andre Castelo\AppData\Local\Microsoft\WindowsApps;C:\Users\Andre Castelo\AppData\Local\Programs\Microsoft VS Code\bin;C:\Users\Andre Castelo\AppData\Roaming\npm;C:\Android\Sdk\platform-tools;C:\Android\Sdk\tools;C:\Users\Andre Castelo\AppData\Local\Yarn\bin;C:\Users\Andre Castelo\AppData\Local\hyper\app-3.0.2\resources\bin;C:\src\flutter\bin
+
+Yarn version: 
+  1.22.0
+
+Node version: 
+  13.7.0
+
+Platform: 
+  win32 x64
+
+Trace: 
+  Error: canceled
+      at Interface.<anonymous> (C:\Program Files (x86)\Yarn\lib\cli.js:136987:13)
+      at Interface.emit (events.js:321:20)
+      at Interface._ttyWrite (readline.js:864:16)
+      at ReadStream.onkeypress (readline.js:203:10)
+      at ReadStream.emit (events.js:321:20)
+      at emitKeys (internal/readline/utils.js:450:14)
+      at emitKeys.next (<anonymous>)
+      at ReadStream.onData (readline.js:1131:36)
+      at ReadStream.emit (events.js:321:20)
+      at addChunk (_stream_readable.js:297:12)
+
+npm manifest: 
+  No manifest
+
+yarn manifest: 
+  No manifest
+
+Lockfile: 
+  No lockfile
