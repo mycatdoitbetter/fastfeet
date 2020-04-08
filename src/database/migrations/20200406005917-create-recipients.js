@@ -2,11 +2,19 @@
 module.exports = {
   up: (queryInterface, Sequelize) => {
     return queryInterface.createTable("recipients", {
-      street: {
+      id: {
         type: Sequelize.INTEGER,
         allowNull: false,
         autoIncrement: true,
         primaryKey: true,
+      },
+      name: {
+        type: Sequelize.STRING,
+        allowNull: false,
+      },
+      street: {
+        type: Sequelize.STRING,
+        allowNull: false,
       },
       number: {
         type: Sequelize.STRING,
@@ -15,19 +23,25 @@ module.exports = {
       complement: {
         type: Sequelize.STRING,
         allowNull: false,
-        unique: true,
       },
       state: {
         type: Sequelize.STRING,
         allowNull: false,
       },
       city: {
-        type: Sequelize.BOOLEAN,
-        defaultValue: false,
+        type: Sequelize.STRING,
         allowNull: false,
       },
       cep: {
         type: Sequelize.STRING,
+        allowNull: false,
+      },
+      created_at: {
+        type: Sequelize.DATE,
+        allowNull: false,
+      },
+      updated_at: {
+        type: Sequelize.DATE,
         allowNull: false,
       },
     });

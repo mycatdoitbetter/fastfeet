@@ -63,3 +63,4 @@ class UserController {
     return response.json({ id, name, email, provider });
   }
 }
+export default new UserController();
