@@ -12,6 +12,11 @@ module.exports = {
         type: Sequelize.STRING,
         allowNull: false,
       },
+      cpf: {
+        type: Sequelize.STRING,
+        allowNull: false,
+        primaryKey: true,
+      },
       street: {
         type: Sequelize.STRING,
         allowNull: false,

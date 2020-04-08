@@ -5,6 +5,7 @@ export default class Recipient extends Model {
     super.init(
       {
         name: Sequelize.STRING,
+        cpf: Sequelize.STRING,
         street: Sequelize.STRING,
         number: Sequelize.STRING,
         complement: Sequelize.STRING,
