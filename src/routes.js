@@ -8,6 +8,7 @@ import RecipientsController from "./app/controllers/RecipientsController";
 import FileController from "./app/controllers/FileController";
 import ProviderController from "./app/controllers/ProviderController";
 import DeliverymanController from "./app/controllers/DeliverymanController";
+import PackageController from "./app/controllers/PackageController";
 
 import authMiddleware from "./app/middlewares/authJWT";
 
@@ -39,4 +40,12 @@ routes.post("/deliveryman", DeliverymanController.store);
 routes.put("/deliveryman/:id", DeliverymanController.update);
 routes.delete("/deliveryman/:id", DeliverymanController.delete);
 routes.get("/deliveryman", DeliverymanController.list);
+
+// PACKAGES
+
+routes.post("/packages", PackageController.store);
+// routes.put("/packages/:id", PackageController.update);
+// routes.delete("/packages/:id", PackageController.delete);
+// routes.get("/packages", PackageController.list);
+
 export default routes;

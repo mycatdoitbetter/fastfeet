@@ -1,5 +1,6 @@
 import * as Yup from "yup";
 import Deliveryman from "../models/Deliveryman";
+import Recipients from "../models/Recipients";
 import File from "../models/File";
 
 class DeliverymanController {
@@ -13,12 +14,14 @@ class DeliverymanController {
       return response.status(400).json({ error: "Validation error" });
     }
 
-    const deliverymanExist = await Deliveryman.findOne({
+    const deliveryman = await Deliveryman.findOne({
       where: { email: require.body.email },
     });
 
-    if (deliverymanExist) {
-      response.status(400).json({ error: "Deliveryman already exists." });
+    if (deliveryman) {
+      return response
+        .status(400)
+        .json({ error: "Deliveryman already exists." });
     }
 
     const { id, name, email } = await Deliveryman.create(require.body);

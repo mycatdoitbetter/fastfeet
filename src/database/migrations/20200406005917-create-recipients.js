@@ -15,7 +15,7 @@ module.exports = {
       cpf: {
         type: Sequelize.STRING,
         allowNull: false,
-        primaryKey: true,
+        unique: true,
       },
       street: {
         type: Sequelize.STRING,
