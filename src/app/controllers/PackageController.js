@@ -11,7 +11,7 @@ class PackageController {
       recipient_id: Yup.number().required(),
       deliveryman_id: Yup.number().required(),
     });
-    const { product, deliveryman_id, recipient_id } = require.body;
+    const { product, deliveryman_id, recipient_id } = await require.body;
 
     if (!(await schema.isValid(require.body))) {
       return response.status(400).json({ error: "Validation error" });
@@ -22,20 +22,21 @@ class PackageController {
     });
 
     if (!deliveryman) {
-      response.status(400).json({ error: "Deliveryman doesnt exists." });
+      return response.status(400).json({ error: "Deliveryman doesnt exists." });
     }
     const recipient = await Recipients.findOne({
       where: { id: recipient_id },
     });
 
     if (!recipient) {
-      response.status(400).json({ error: "Recipient doesnt exists." });
+      return response.status(400).json({ error: "Recipient doesnt exists." });
     }
+    console.log(Package);
 
     const pack = await Package.create({
-      product: product,
-      deliveryman_id: deliveryman_id,
-      recipient_id: recipient_id,
+      product,
+      deliveryman_id,
+      recipient_id,
     });
 
     return response.json(pack);

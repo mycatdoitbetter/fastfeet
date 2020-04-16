@@ -28,25 +28,9 @@ class RecipientsController {
       return response.status(400).json({ error: "Recipient already exists" });
     }
 
-    const {
-      name,
-      street,
-      number,
-      complement,
-      state,
-      city,
-      cep,
-    } = await Recipients.create(require.body);
+    const recipient = await Recipients.create(require.body);
 
-    return response.json({
-      name,
-      street,
-      number,
-      complement,
-      state,
-      city,
-      cep,
-    });
+    return response.json(recipient);
   }
   async update(require, response) {
     if (!(await schema.isValid(require.body))) {

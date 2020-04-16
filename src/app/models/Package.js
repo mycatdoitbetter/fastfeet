@@ -5,8 +5,7 @@ export default class Package extends Model {
     super.init(
       {
         product: Sequelize.STRING,
-        // start_date: Sequelize.DATE,
-        // end_date: Sequelize.DATE,
+
         canceled_at: Sequelize.DATE,
       },
       {
@@ -18,13 +17,14 @@ export default class Package extends Model {
   }
 
   static associate(models) {
+    this.belongsTo(models.Recipient, {
+      foreignKey: "recipient_id",
+      as: "recipients",
+    });
+
     this.belongsTo(models.Deliveryman, {
       foreignKey: "deliveryman_id",
       as: "deliveryman",
-    });
-    this.belongsTo(models.File, {
-      foreignKey: "recipient_id ",
-      as: "recipient",
     });
   }
 }
