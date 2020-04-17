@@ -46,6 +46,7 @@ routes.get("/deliveryman", DeliverymanController.list);
 routes.post("/packages", PackageController.store);
 // routes.put("/packages/:id", PackageController.update);
 // routes.delete("/packages/:id", PackageController.delete);
-// routes.get("/packages", PackageController.list);
+routes.get("/packages/list", PackageController.list);
+routes.get("/packages/list-all", PackageController.listAll);
 
 export default routes;

@@ -1,9 +1,11 @@
 import * as Yup from "yup";
-import { startOfHour, parseISO, isBefore, format, subHours } from "date-fns";
-import pt from "date-fns/locale/pt";
+// import { startOfHour, parseISO, isBefore, format, subHours } from "date-fns";
+// import pt from "date-fns/locale/pt";
+import { Op } from "sequelize";
 import Deliveryman from "../models/Deliveryman";
 import Recipients from "../models/Recipients";
 import Package from "../models/Package";
+import File from "../models/File";
 class PackageController {
   async store(require, response) {
     const schema = Yup.object().shape({
@@ -41,8 +43,78 @@ class PackageController {
 
     return response.json(pack);
   }
+  async listAll(require, response) {
+    const appointmentPerPage = 20;
+    const { page = 1 } = require.query;
+    const packsAvailable = await Package.findAll({
+      attributes: ["id", "product", "start_date", "end_date", "canceled_at"],
+      limit: appointmentPerPage,
+      offset: (page - 1) * appointmentPerPage,
+      include: [
+        {
+          model: Deliveryman,
+          as: "deliveryman",
+          attributes: ["id", "name"],
+          include: {
+            model: File,
+            as: "avatar",
+            attributes: ["id", "path", "url"],
+          },
+        },
+        {
+          model: Recipients,
+          as: "recipients",
+          attributes: [
+            "id",
+            "name",
+            "number",
+            "street",
+            "complement",
+            "state",
+            "city",
+            "cep",
+          ],
+        },
+      ],
+    });
+    return response.json(packsAvailable);
+  }
   async list(require, response) {
-    return response.json({ list: true });
+    const appointmentPerPage = 20;
+    const { page = 1 } = require.query;
+    const packsAvailable = await Package.findAll({
+      where: { canceled_at: { [Op.ne]: null } },
+      attributes: ["id", "product", "start_date", "end_date", "canceled_at"],
+      limit: appointmentPerPage,
+      offset: (page - 1) * appointmentPerPage,
+      include: [
+        {
+          model: Deliveryman,
+          as: "deliveryman",
+          attributes: ["id", "name"],
+          include: {
+            model: File,
+            as: "avatar",
+            attributes: ["id", "path", "url"],
+          },
+        },
+        {
+          model: Recipients,
+          as: "recipients",
+          attributes: [
+            "id",
+            "name",
+            "number",
+            "street",
+            "complement",
+            "state",
+            "city",
+            "cep",
+          ],
+        },
+      ],
+    });
+    return response.json(packsAvailable);
   }
   async delete(require, response) {
     return response.json({ delete: true });
