@@ -13,12 +13,15 @@ module.exports = {
         type: Sequelize.STRING,
         allowNull: false,
       },
-      email: {
+      cpf: {
         type: Sequelize.STRING,
         allowNull: false,
         unique: true,
       },
-
+      password_hash: {
+        type: Sequelize.STRING,
+        allowNull: false,
+      },
       created_at: {
         type: Sequelize.DATE,
         allowNull: false,

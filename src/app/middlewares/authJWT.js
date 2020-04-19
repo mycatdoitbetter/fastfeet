@@ -20,5 +20,5 @@ export default async (require, response, next) => {
     return response.status(401).json({ error: "Token invalid" });
   }
 
-  return next;
+  return next();
 };

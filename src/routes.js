@@ -9,6 +9,7 @@ import FileController from "./app/controllers/FileController";
 import ProviderController from "./app/controllers/ProviderController";
 import DeliverymanController from "./app/controllers/DeliverymanController";
 import PackageController from "./app/controllers/PackageController";
+import NotificationController from "./app/controllers/NotificationController";
 
 import authMiddleware from "./app/middlewares/authJWT";
 
@@ -24,7 +25,6 @@ routes.use(authMiddleware);
 routes.put("/user/update", UserController.update);
 
 // RECIPIENTS
-
 routes.post("/recipients/create", RecipientsController.store);
 routes.put("/recipients/update", RecipientsController.update);
 routes.get("/recipients/list", RecipientsController.list);
@@ -42,11 +42,17 @@ routes.delete("/deliveryman/:id", DeliverymanController.delete);
 routes.get("/deliveryman", DeliverymanController.list);
 
 // PACKAGES
-
-routes.post("/packages", PackageController.store);
-// routes.put("/packages/:id", PackageController.update);
-// routes.delete("/packages/:id", PackageController.delete);
+routes.post("/packages/create", PackageController.store);
 routes.get("/packages/list", PackageController.list);
 routes.get("/packages/list-all", PackageController.listAll);
+routes.get("/packages/list-canceled", PackageController.listCanceled);
+routes.put("/packages/update-start-date", PackageController.updateStartDate);
+routes.put("/packages/update-end-date", PackageController.updateEndDate);
+routes.put("/packages/cancel", PackageController.updateCancel);
+routes.delete("/packages/delete", PackageController.delete);
+
+// NOTIFICATIONS
+
+routes.get("/notifications/list", NotificationController.list);
 
 export default routes;

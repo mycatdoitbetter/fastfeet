@@ -1,21 +1,28 @@
 import * as Yup from "yup";
 import Deliveryman from "../models/Deliveryman";
-import Recipients from "../models/Recipients";
 import File from "../models/File";
+import User from "../models/User";
 
 class DeliverymanController {
   async store(require, response) {
     const schema = Yup.object().shape({
       name: Yup.string().required(),
-      email: Yup.string().email().required(),
+      cpf: Yup.string().length(14).required(),
     });
+
+    const provider = User.findByPk(require.userId);
+    if (!provider) {
+      return response
+        .status(400)
+        .json({ error: "only providers can create a deliveryman" });
+    }
 
     if (!(await schema.isValid(require.body))) {
       return response.status(400).json({ error: "Validation error" });
     }
 
     const deliveryman = await Deliveryman.findOne({
-      where: { email: require.body.email },
+      where: { cpf: require.body.cpf },
     });
 
     if (deliveryman) {
@@ -24,29 +31,48 @@ class DeliverymanController {
         .json({ error: "Deliveryman already exists." });
     }
 
-    const { id, name, email } = await Deliveryman.create(require.body);
+    const { id, name, cpf } = await Deliveryman.create(require.body);
 
-    return response.json({ id, name, email });
+    return response.json({ id, name, cpf });
   }
   async update(require, response) {
     const schema = Yup.object().shape({
-      name: Yup.string(),
-      email: Yup.string().email(),
+      cpf: Yup.string(),
+      avatar_id: Yup.number(),
     });
+
+    const provider = User.findByPk(require.userId);
+    if (!provider) {
+      return response
+        .status(400)
+        .json({ error: "only providers can update a deliveryman" });
+    }
 
     if (!(await schema.isValid(require.body))) {
       return response.status(400).json({ error: "Validation error" });
     }
-    const deliveryman = await Deliveryman.findByPk(require.params.id);
+
+    const deliveryman = await Deliveryman.findByPk(require.params.id, {
+      attributes: ["id", "cpf", "name", "avatar_id"],
+      include: [
+        { model: File, as: "avatar", attributes: ["name", "path", "url"] },
+      ],
+    });
     if (!deliveryman) {
       return response.status(401).json({ error: "deliveryman has not found" });
     }
 
-    const deliverymanUpdated = await deliveryman.update(require.body);
+    await deliveryman.update(require.body);
 
-    return response.json(deliverymanUpdated);
+    return response.json(deliveryman);
   }
   async delete(require, response) {
+    const provider = User.findByPk(require.userId);
+    if (!provider) {
+      return response
+        .status(400)
+        .json({ error: "only providers can delete a deliveryman" });
+    }
     const deliveryman = await Deliveryman.findByPk(require.params.id);
     Deliveryman.destroy({ where: { id: require.params.id } });
     if (!deliveryman) {
@@ -59,8 +85,14 @@ class DeliverymanController {
     });
   }
   async list(require, response) {
+    const provider = User.findByPk(require.userId);
+    if (!provider) {
+      return response
+        .status(400)
+        .json({ error: "only providers can list deliverymans" });
+    }
     const deliveryman = await Deliveryman.findAll({
-      attributes: ["id", "email", "name", "avatar_id"],
+      attributes: ["id", "cpf", "name", "avatar_id"],
       include: [
         { model: File, as: "avatar", attributes: ["name", "path", "url"] },
       ],
