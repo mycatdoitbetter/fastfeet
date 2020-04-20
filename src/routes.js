@@ -7,7 +7,6 @@ import SessionController from "./app/controllers/SessionController";
 import RecipientsController from "./app/controllers/RecipientsController";
 import FileController from "./app/controllers/FileController";
 import ProviderController from "./app/controllers/ProviderController";
-import DeliverymanController from "./app/controllers/DeliverymanController";
 import PackageController from "./app/controllers/PackageController";
 import NotificationController from "./app/controllers/NotificationController";
 
@@ -34,12 +33,6 @@ routes.post("/files", upload.single("file"), FileController.store);
 
 //PROVIDERS
 routes.get("/providers", ProviderController.list);
-
-//DELIVERYMAN
-routes.post("/deliveryman", DeliverymanController.store);
-routes.put("/deliveryman/:id", DeliverymanController.update);
-routes.delete("/deliveryman/:id", DeliverymanController.delete);
-routes.get("/deliveryman", DeliverymanController.list);
 
 // PACKAGES
 routes.post("/packages/create", PackageController.store);

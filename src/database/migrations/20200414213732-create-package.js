@@ -26,7 +26,7 @@ module.exports = {
       },
       deliveryman_id: {
         type: Sequelize.INTEGER,
-        references: { model: "deliverymans", key: "id" },
+        references: { model: "users", key: "id" },
         onUpdate: "CASCADE",
         onDelete: "SET NULL",
         allowNul: true,

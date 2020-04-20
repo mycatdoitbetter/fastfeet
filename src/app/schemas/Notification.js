@@ -2,6 +2,10 @@ import mongoose from "mongoose";
 
 const NotificationSchema = new mongoose.Schema(
   {
+    user: {
+      type: Number,
+      required: true,
+    },
     title: {
       type: String,
       required: true,

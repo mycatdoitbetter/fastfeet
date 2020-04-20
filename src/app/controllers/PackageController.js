@@ -2,7 +2,7 @@ import * as Yup from "yup";
 // import { startOfHour, parseISO, isBefore, format, subHours } from "date-fns";
 // import pt from "date-fns/locale/pt";
 import { Op } from "sequelize";
-import Deliveryman from "../models/Deliveryman";
+// import Deliveryman from "../models/Deliveryman";
 import User from "../models/User";
 import Recipients from "../models/Recipients";
 import Package from "../models/Package";
@@ -17,7 +17,9 @@ class PackageController {
     });
     const { product, deliveryman_id, recipient_id } = await require.body;
 
-    const provider = User.findByPk(require.userId);
+    const provider = User.findOne({
+      where: { id: require.userId, provider: true },
+    });
     if (!provider) {
       return response
         .status(400)
@@ -28,8 +30,8 @@ class PackageController {
       return response.status(400).json({ error: "Validation error" });
     }
 
-    const deliveryman = await Deliveryman.findOne({
-      where: { id: deliveryman_id },
+    const deliveryman = await User.findOne({
+      where: { id: deliveryman_id, provider: false },
     });
 
     if (!deliveryman) {
@@ -45,6 +47,7 @@ class PackageController {
     }
 
     await Notification.create({
+      user: `${deliveryman.id}`,
       title: `Um novo produto foi cadastrado para ${deliveryman.name}`,
       product: `${product}`,
       to: `${recipient.name}`,
@@ -63,6 +66,15 @@ class PackageController {
     return response.json(pack);
   }
   async list(require, response) {
+    const provider = User.findOne({
+      where: { id: require.userId, provider: false },
+    });
+    if (provider) {
+      return response.status(400).json({
+        error: "This route is for deliverymans, please, use the list all route",
+      });
+    }
+
     const packs = await Package.findAll({
       where: { deliveryman_id: require.userId, canceled_at: null },
     });
@@ -70,6 +82,14 @@ class PackageController {
     return response.json(packs);
   }
   async listAll(require, response) {
+    const provider = User.findOne({
+      where: { id: require.userId, provider: true },
+    });
+    if (!provider) {
+      return response
+        .status(400)
+        .json({ error: "only providers can list all packs" });
+    }
     const appointmentPerPage = 20;
     const { page = 1 } = require.query;
     const packsAvailable = await Package.findAll({
@@ -78,7 +98,7 @@ class PackageController {
       offset: (page - 1) * appointmentPerPage,
       include: [
         {
-          model: Deliveryman,
+          model: User,
           as: "deliveryman",
           attributes: ["id", "name"],
           include: {
@@ -106,6 +126,14 @@ class PackageController {
     return response.json(packsAvailable);
   }
   async listCanceled(require, response) {
+    const provider = User.findOne({
+      where: { id: require.userId, provider: true },
+    });
+    if (!provider) {
+      return response
+        .status(400)
+        .json({ error: "only providers can list canceled packs" });
+    }
     const appointmentPerPage = 20;
     const { page = 1 } = require.query;
     const packsCanceled = await Package.findAll({
@@ -115,7 +143,7 @@ class PackageController {
       offset: (page - 1) * appointmentPerPage,
       include: [
         {
-          model: Deliveryman,
+          model: User,
           as: "deliveryman",
           attributes: ["id", "name"],
           include: {
@@ -212,11 +240,13 @@ class PackageController {
     return response.json(packUpdated);
   }
   async delete(require, response) {
-    const user = await User.findByPk(require.userId);
-    if (!user) {
+    const provider = User.findOne({
+      where: { id: require.userId, provider: true },
+    });
+    if (!provider) {
       return response
-        .status(401)
-        .json({ error: "Only providers can delete a pack" });
+        .status(400)
+        .json({ error: "only providers can delete a pack" });
     }
     const pack = await Package.findByPk(require.query.id);
     if (!pack) {

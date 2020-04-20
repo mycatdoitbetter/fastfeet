@@ -1,9 +1,12 @@
 import User from "../models/User";
+import File from "../models/File";
+import { Op } from "sequelize";
 import * as Yup from "yup";
 class UserController {
   async store(require, response) {
     const schema = Yup.object().shape({
       name: Yup.string().required(),
+      cpf: Yup.string().length(14).required(),
       email: Yup.string().email().required(),
       password: Yup.string().required().min(6),
     });
@@ -13,11 +16,13 @@ class UserController {
     }
 
     const user = await User.findOne({
-      where: { email: require.body.email },
+      where: {
+        [Op.or]: [{ email: require.body.email }, { cpf: require.body.cpf }],
+      },
     });
 
     if (user) {
-      response.status(400).json({ error: "User already exists" });
+      return response.status(400).json({ error: "User already exists" });
     }
 
     const { id, name, email, provider } = await User.create(require.body);
@@ -43,24 +48,36 @@ class UserController {
       return response.status(400).json({ error: "Validation error" });
     }
 
-    const { email, oldPassword } = require.body;
-
     const user = await User.findByPk(require.userId);
 
-    if (email !== user.email) {
+    if (require.body.email && require.body.email !== user.email) {
       const emailExists = await User.findOne({ where: { email } });
       if (emailExists) {
         response.status(400).json({ error: "Email already exists." });
       }
     }
 
-    if (oldPassword && !(await user.checkPassword(oldPassword))) {
+    if (
+      require.body.oldPassword &&
+      !(await user.checkPassword(require.body.oldPassword))
+    ) {
       return response.status(401).json({ error: "Passwords does't match" });
     }
 
-    const { id, name, provider } = await user.update(require.body);
+    await user.update(require.body);
 
-    return response.json({ id, name, email, provider });
+    const updated = await User.findByPk(require.userId, {
+      attributes: ["id", "name", "email", "cpf"],
+      include: [
+        {
+          model: File,
+          as: "avatar",
+          attributes: ["name", "id", "path", "url"],
+        },
+      ],
+    });
+
+    return response.json(updated);
   }
 }
 export default new UserController();

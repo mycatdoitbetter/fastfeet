@@ -4,8 +4,10 @@ import Notification from "../schemas/Notification";
 
 class NotificationController {
   async list(require, response) {
-    const notifications = await Notification.find();
-    return response.json({ ok: true });
+    const notifications = await Notification.find({
+      user: require.userId,
+    }).sort("createdAt");
+    return response.json(notifications);
   }
 }
 

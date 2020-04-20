@@ -24,7 +24,7 @@ export default class Package extends Model {
       as: "recipients",
     });
 
-    this.belongsTo(models.Deliveryman, {
+    this.belongsTo(models.User, {
       foreignKey: "deliveryman_id",
       as: "deliveryman",
     });

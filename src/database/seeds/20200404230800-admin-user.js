@@ -8,7 +8,8 @@ module.exports = {
       [
         {
           name: "Distribuidora FastFeet",
-          email: "admin@fastfeet.com",
+          cpf: "123.123.123-11",
+          email: "distribuidora@gmail.com",
           password_hash: bcrypt.hashSync("123456", 8),
           created_at: new Date(),
           updated_at: new Date(),
