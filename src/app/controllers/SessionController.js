@@ -1,6 +1,5 @@
 import jwt from "jsonwebtoken";
 import User from "../models/User";
-// import Deliveryman from "../models/Deliveryman";
 
 import authConfig from "../../config/auth";
 class SessionController {

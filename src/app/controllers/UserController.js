@@ -79,5 +79,29 @@ class UserController {
 
     return response.json(updated);
   }
+  async list(require, response) {
+    const providerId = require.userId;
+    const isProvider = require.query.provider === "true";
+
+    const provider = User.findOne({
+      where: { id: providerId, provider: true },
+    });
+
+    if (!provider) {
+      return response
+        .status(401)
+        .json({ error: "Only providers can list the users" });
+    }
+
+    const users = await User.findAll({
+      where: { provider: isProvider },
+      attributes: ["id", "name", "email", "cpf"],
+      include: [
+        { model: File, as: "avatar", attributes: ["name", "path", "url"] },
+      ],
+    });
+
+    return response.json({ users });
+  }
 }
 export default new UserController();

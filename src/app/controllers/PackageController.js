@@ -2,7 +2,7 @@ import * as Yup from "yup";
 // import { startOfHour, parseISO, isBefore, format, subHours } from "date-fns";
 // import pt from "date-fns/locale/pt";
 import { Op } from "sequelize";
-// import Deliveryman from "../models/Deliveryman";
+
 import User from "../models/User";
 import Recipients from "../models/Recipients";
 import Package from "../models/Package";
@@ -66,10 +66,8 @@ class PackageController {
     return response.json(pack);
   }
   async list(require, response) {
-    const provider = User.findOne({
-      where: { id: require.userId, provider: false },
-    });
-    if (provider) {
+    const user = User.findByPk(require.userId);
+    if (user.provider) {
       return response.status(400).json({
         error: "This route is for deliverymans, please, use the list all route",
       });
@@ -183,7 +181,7 @@ class PackageController {
     const { id, start_date } = require.body;
 
     const pack = await Package.findOne({
-      where: { id: id, start_date: null, canceled_at: null },
+      where: { id: id, start_date: null, end_date: null, canceled_at: null },
     });
     if (!pack) {
       return response
@@ -208,7 +206,12 @@ class PackageController {
     const { id, end_date } = require.body;
 
     const pack = await Package.findOne({
-      where: { id: id, end_date: null, canceled_at: null },
+      where: {
+        id: id,
+        start_date: { [Op.ne]: null },
+        end_date: null,
+        canceled_at: null,
+      },
     });
 
     if (!pack) {

@@ -1,4 +1,4 @@
-import { Router, response } from "express";
+import { Router } from "express";
 import multer from "multer";
 import multerConfig from "./config/multer";
 
@@ -9,6 +9,7 @@ import FileController from "./app/controllers/FileController";
 import ProviderController from "./app/controllers/ProviderController";
 import PackageController from "./app/controllers/PackageController";
 import NotificationController from "./app/controllers/NotificationController";
+import ProblemsController from "./app/controllers/ProblemsController";
 
 import authMiddleware from "./app/middlewares/authJWT";
 
@@ -18,9 +19,12 @@ const upload = multer(multerConfig);
 // SESSIONS
 routes.post("/sessions", SessionController.store);
 
-// USER
-routes.post("/user/create", UserController.store);
+// AUTH TOKEN MIDDLEWARE
 routes.use(authMiddleware);
+
+// USER
+routes.get("/user/list", UserController.list);
+routes.post("/user/create", UserController.store);
 routes.put("/user/update", UserController.update);
 
 // RECIPIENTS
@@ -47,5 +51,12 @@ routes.delete("/packages/delete", PackageController.delete);
 // NOTIFICATIONS
 
 routes.get("/notifications/list", NotificationController.list);
+routes.get("/notifications/list-all", NotificationController.listAll);
+routes.put("/notifications/read/:id", NotificationController.read);
+
+// PROBLEMS
+
+routes.get("/problems/list", ProblemsController.list);
+routes.post("/problems/create", ProblemsController.store);
 
 export default routes;

@@ -3,11 +3,12 @@ import mongoose from "mongoose";
 import databaseConfig from "../config/database";
 import User from "../app/models/User";
 import Recipients from "../app/models/Recipients";
-// import Deliveryman from "../app/models/Deliveryman";
+import Problems from "../app/models/Problems";
+
 import File from "../app/models/File";
 import Package from "../app/models/Package";
 
-const models = [User, File, Recipients, Package];
+const models = [User, File, Recipients, Package, Problems];
 class Database {
   constructor() {
     this.init();
@@ -17,7 +18,7 @@ class Database {
     this.connection = new Sequelize(databaseConfig);
     models.map((model) => model.init(this.connection));
     User.associate(this.connection.models);
-    // Deliveryman.associate(this.connection.models);
+    Problems.associate(this.connection.models);
     Package.associate(this.connection.models);
   }
   mongo() {
