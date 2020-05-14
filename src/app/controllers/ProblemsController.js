@@ -32,18 +32,6 @@ class ProblemController {
     return response.json({ newProblem });
   }
   async list(require, response) {
-    const provider = await User.findOne({
-      where: {
-        id: require.userId,
-        provider: true,
-      },
-    });
-    // if (!provider) {
-    //   return response
-    //     .status(401)
-    //     .json({ error: "Only providers can list all the problems" });
-    // }
-
     const problems = await Problems.findAll({
       attributes: ["id", "title", "description"],
       include: [
@@ -67,7 +55,7 @@ class ProblemController {
                 "cep",
               ],
             },
-            provider
+            require.isProvider
               ? {
                   model: User,
                   as: "deliveryman",

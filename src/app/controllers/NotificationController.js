@@ -9,10 +9,7 @@ class NotificationController {
     return response.json(notifications);
   }
   async listAll(require, response) {
-    const provider = User.findOne({
-      where: { id: require.userId, provider: true },
-    });
-    if (!provider) {
+    if (!require.isProvider) {
       return response
         .status(401)
         .json({ error: "Only providers can list all the notifications" });

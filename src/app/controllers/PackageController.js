@@ -17,10 +17,7 @@ class PackageController {
     });
     const { product, deliveryman_id, recipient_id } = await require.body;
 
-    const provider = User.findOne({
-      where: { id: require.userId, provider: true },
-    });
-    if (!provider) {
+    if (!require.isProvider) {
       return response
         .status(400)
         .json({ error: "only providers can register a new pack" });
@@ -66,8 +63,7 @@ class PackageController {
     return response.json(pack);
   }
   async list(require, response) {
-    const user = User.findByPk(require.userId);
-    if (user.provider) {
+    if (require.isProvider) {
       return response.status(400).json({
         error: "This route is for deliverymans, please, use the list all route",
       });
@@ -80,10 +76,7 @@ class PackageController {
     return response.json(packs);
   }
   async listAll(require, response) {
-    const provider = User.findOne({
-      where: { id: require.userId, provider: true },
-    });
-    if (!provider) {
+    if (!require.isProvider) {
       return response
         .status(400)
         .json({ error: "only providers can list all packs" });
@@ -124,10 +117,7 @@ class PackageController {
     return response.json(packsAvailable);
   }
   async listCanceled(require, response) {
-    const provider = User.findOne({
-      where: { id: require.userId, provider: true },
-    });
-    if (!provider) {
+    if (!require.isProvider) {
       return response
         .status(400)
         .json({ error: "only providers can list canceled packs" });

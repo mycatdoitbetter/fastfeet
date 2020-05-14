@@ -24,6 +24,12 @@ class RecipientsController {
       },
     });
 
+    if (!require.isProvider) {
+      return response
+        .status(401)
+        .json({ error: "Only providers can registe a pack" });
+    }
+
     if (recipients) {
       return response.status(400).json({ error: "Recipient already exists" });
     }
