@@ -14,8 +14,9 @@ export default async (require, response, next) => {
 
   try {
     const decoded = await promisify(jwt.verify)(token, authConfig.secret);
+    // console.warn(`decoded: ${[...decoded]}`)
     require.userId = decoded.id;
-    require.isProvider = decoded.provider;
+    
 
     return next();
   } catch (error) {

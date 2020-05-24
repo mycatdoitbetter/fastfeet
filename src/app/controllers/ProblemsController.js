@@ -7,7 +7,7 @@ import File from "../models/File";
 class ProblemController {
   async store(require, response) {
     const { title, description } = require.body;
-    const package_id = require.query.package_id;
+    const package_id = require.query.id;
 
     const pack = await Package.findByPk(package_id);
 
@@ -32,6 +32,7 @@ class ProblemController {
     return response.json({ newProblem });
   }
   async list(require, response) {
+    const isProvider = await User.findOne({where : {id: require.userId, provider: true}})
     const problems = await Problems.findAll({
       attributes: ["id", "title", "description"],
       include: [
@@ -55,7 +56,7 @@ class ProblemController {
                 "cep",
               ],
             },
-            require.isProvider
+            isProvider
               ? {
                   model: User,
                   as: "deliveryman",

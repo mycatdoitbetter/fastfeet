@@ -1,9 +1,10 @@
 import Recipients from "../models/Recipients";
+import User from '../models/User';
 import * as Yup from "yup";
 
 const schema = Yup.object().shape({
   name: Yup.string().required(),
-  cpf: Yup.string().required().length(11),
+  cpf: Yup.string().required().length(14),
   street: Yup.string().required(),
   number: Yup.string().required(),
   complement: Yup.string().required(),
@@ -23,8 +24,9 @@ class RecipientsController {
         cpf: require.body.cpf,
       },
     });
+    const isProvider = await User.findOne({where : {id: require.userId, provider: true}})
 
-    if (!require.isProvider) {
+    if (!isProvider) {
       return response
         .status(401)
         .json({ error: "Only providers can registe a pack" });

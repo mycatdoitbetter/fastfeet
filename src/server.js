@@ -1,3 +1,7 @@
 import app from "./app";
 
-app.listen(3333);
+app.on('listening',function(){
+    console.log('ok, server is running');
+});
+
+app.listen(3232);

@@ -7,7 +7,7 @@ import User from "../models/User";
 import Recipients from "../models/Recipients";
 import Package from "../models/Package";
 import File from "../models/File";
-import Notification from "../schemas/Notification";
+
 class PackageController {
   async store(require, response) {
     const schema = Yup.object().shape({
@@ -16,8 +16,8 @@ class PackageController {
       deliveryman_id: Yup.number().required(),
     });
     const { product, deliveryman_id, recipient_id } = await require.body;
-
-    if (!require.isProvider) {
+    const isProvider = await User.findOne({where : {id: require.userId, provider: true}})
+    if (!isProvider) {
       return response
         .status(400)
         .json({ error: "only providers can register a new pack" });
@@ -43,16 +43,7 @@ class PackageController {
       return response.status(400).json({ error: "Recipient doesnt exists." });
     }
 
-    await Notification.create({
-      user: `${deliveryman.id}`,
-      title: `Um novo produto foi cadastrado para ${deliveryman.name}`,
-      product: `${product}`,
-      to: `${recipient.name}`,
-      recipient: `Rua ${recipient.street} - N°${recipient.number}`,
-      complement: `${recipient.complement}`,
-      city: `${recipient.city} - ${recipient.state}`,
-      cep: `${recipient.cep}`,
-    });
+    
 
     const pack = await Package.create({
       product,
@@ -63,7 +54,9 @@ class PackageController {
     return response.json(pack);
   }
   async list(require, response) {
-    if (require.isProvider) {
+    const isProvider = await User.findOne({where : {id: require.userId, provider: true}})
+    console.log(isProvider)
+    if (isProvider) {
       return response.status(400).json({
         error: "This route is for deliverymans, please, use the list all route",
       });
@@ -71,12 +64,40 @@ class PackageController {
 
     const packs = await Package.findAll({
       where: { deliveryman_id: require.userId, canceled_at: null },
+      attributes: ["id", "product", "start_date", "end_date", "canceled_at"],
+      include: [
+        {
+          model: User,
+          as: "deliveryman",
+          attributes: ["id", "name"],
+          include: {
+            model: File,
+            as: "avatar",
+            attributes: ["id", "path", "url"],
+          },
+        },
+        {
+          model: Recipients,
+          as: "recipients",
+          attributes: [
+            "id",
+            "name",
+            "number",
+            "street",
+            "complement",
+            "state",
+            "city",
+            "cep",
+          ],
+        },
+      ],
     });
 
     return response.json(packs);
   }
   async listAll(require, response) {
-    if (!require.isProvider) {
+    const isProvider = await User.findOne({where : {id: require.userId, provider: true}})
+    if (!isProvider) {
       return response
         .status(400)
         .json({ error: "only providers can list all packs" });
@@ -117,7 +138,8 @@ class PackageController {
     return response.json(packsAvailable);
   }
   async listCanceled(require, response) {
-    if (!require.isProvider) {
+    const isProvider = await User.findOne({where : {id: require.userId, provider: true}})
+    if (!isProvider) {
       return response
         .status(400)
         .json({ error: "only providers can list canceled packs" });
@@ -159,19 +181,11 @@ class PackageController {
     return response.json(packsCanceled);
   }
   async updateStartDate(require, response) {
-    const schema = Yup.object().shape({
-      id: Yup.number().required(),
-      start_date: Yup.date().required(),
-    });
 
-    if (!(await schema.isValid(require.body))) {
-      return response.status(400).json({ error: "Validation error" });
-    }
 
-    const { id, start_date } = require.body;
 
     const pack = await Package.findOne({
-      where: { id: id, start_date: null, end_date: null, canceled_at: null },
+      where: { id: require.query.id, start_date: null, end_date: null, canceled_at: null },
     });
     if (!pack) {
       return response
@@ -179,25 +193,16 @@ class PackageController {
         .json({ error: "You can not upgrade this package or its not exist." });
     }
 
-    const packUpdated = await pack.update({ start_date });
+    const packUpdated = await pack.update({ start_date: new Date() });
 
     return response.json(packUpdated);
   }
   async updateEndDate(require, response) {
-    const schema = Yup.object().shape({
-      id: Yup.number().required(),
-      end_date: Yup.date().required(),
-    });
-
-    if (!(await schema.isValid(require.body))) {
-      return response.status(400).json({ error: "Validation error" });
-    }
-
-    const { id, end_date } = require.body;
+  
 
     const pack = await Package.findOne({
       where: {
-        id: id,
+        id: require.query.id,
         start_date: { [Op.ne]: null },
         end_date: null,
         canceled_at: null,
@@ -210,27 +215,27 @@ class PackageController {
         .json({ error: "You can not upgrade this package or its not exist." });
     }
 
-    const packUpdated = await pack.update({ end_date });
+    const packUpdated = await pack.update({ end_date: new Date() });
 
     return response.json(packUpdated);
   }
   async updateCancel(require, response) {
-    const user = await User.findByPk(require.userId);
-    if (!user) {
+    const isProvider  = await User.findOne({where: {id: require.userId, provider: true}});
+    if (!isProvider) {
       return response
         .status(401)
         .json({ error: "Only providers can cancel a pack" });
     }
-    const pack = await Package.findByPk(require.query.id);
+    const pack = await Package.findOne({where: {id: require.query.id, canceled_at: null}});
     if (!pack) {
       return response
         .status(401)
-        .json({ error: "The package does not exist." });
+        .json({ error: "The package does not exist or already canceled." });
     }
 
     const packUpdated = await pack.update({ canceled_at: new Date() });
 
-    return response.json(packUpdated);
+    return response.json({canceled: packUpdated});
   }
   async delete(require, response) {
     const provider = User.findOne({

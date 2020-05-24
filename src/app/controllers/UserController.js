@@ -17,8 +17,10 @@ class UserController {
     if (!(await schema.isValid(require.body))) {
       return response.status(400).json({ error: "Validation error" });
     }
+    const isProvider = await User.findOne({where : {id: require.userId, provider: true}})
 
-    if (!require.isProvider) {
+    if (!isProvider) {
+        // console.log(require.isProvider);
       return response.status(401).json({
         error: "Only providers can regist a new user",
       });
