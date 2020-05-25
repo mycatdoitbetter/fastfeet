@@ -33,7 +33,6 @@ routes.get("/recipients/list", RecipientsController.list);
 
 //FILES
 routes.post("/files", upload.single("file"), FileController.store);
-routes.get("/files" , FileController.getURL);
 
 // PACKAGES
 routes.post("/packages/create", PackageController.store);
