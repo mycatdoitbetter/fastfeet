@@ -1,5 +1,6 @@
 import jwt from "jsonwebtoken";
 import User from "../models/User";
+import File from "../models/File";
 
 import authConfig from "../../config/auth";
 class SessionController {
@@ -8,6 +9,11 @@ class SessionController {
 
     const user = await User.findOne({
       where: { cpf },
+      
+    //   attributes: ["id", "name", "email", "cpf"],
+    //   include: [
+    //     { model: File, as: "avatar", attributes: ["name", "path", "url"] },
+    //   ],
     });
     if (!user) {
       return response.status(401).json({ error: "User not found." });
@@ -18,14 +24,20 @@ class SessionController {
         .json({ error: "The password does not match" });
     }
 
-    const { id, name } = user;
+    const userStats = await User.findOne({
+        where: { cpf },
+        
+        attributes: ["id", "name", "email", "cpf"],
+        include: [
+          { model: File, as: "avatar" },
+        ],
+      });
+
+    const { id,} = user;
+  
     return response.json({
-      user: {
-        id,
-        name,
-        cpf,
-      },
-      token: jwt.sign({ id }, authConfig.secret, {
+      user: userStats,
+      token: jwt.sign( {id} , authConfig.secret, {
         expiresIn: authConfig.expiresIn,
       }),
     });

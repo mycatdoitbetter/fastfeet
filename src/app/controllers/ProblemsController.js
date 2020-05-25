@@ -33,13 +33,15 @@ class ProblemController {
   }
   async list(require, response) {
     const isProvider = await User.findOne({where : {id: require.userId, provider: true}})
+    
     const problems = await Problems.findAll({
       attributes: ["id", "title", "description"],
       include: [
         {
           model: Package,
           as: "packages",
-          attributes: ["id", "product", "start_date"],
+          attributes: ["id", "product", "canceled_at"],
+          
           include: [
             {
               model: Recipients,
@@ -54,6 +56,7 @@ class ProblemController {
                 "state",
                 "city",
                 "cep",
+                
               ],
             },
             isProvider
@@ -61,21 +64,22 @@ class ProblemController {
                   model: User,
                   as: "deliveryman",
                   attributes: ["id", "name"],
-                  include: [{ model: File, as: "avatar" }],
+                  include: [{ model: File, as: "avatar", attributes: ["id", "url"],}],
                 }
               : {
                   where: { id: require.userId },
                   model: User,
                   as: "deliveryman",
                   attributes: ["id", "name"],
-                  include: [{ model: File, as: "avatar" }],
+                  include: [{ model: File, as: "avatar", attributes: ["id", "url"] }],
                 },
           ],
         },
       ],
     });
-
-    return response.json({ problems });
+   
+    console.log({problems})
+    return response.json( problems );
   }
 }
 export default new ProblemController();

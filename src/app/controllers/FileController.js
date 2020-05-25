@@ -8,6 +8,12 @@ class FileController {
 
     return response.json(file);
   }
+  async getURL(require, response) {
+
+    const file = await File.findOne({ where: {id: require.query.id} });
+
+    return response.json(file.url);
+  }
 }
 
 export default new FileController();
